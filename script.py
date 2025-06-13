@@ -69,7 +69,7 @@ if st.session_state.api_key_valid:
         assistant = client.beta.assistants.create(
             name="Research Assistant in Law",
             instructions="You are an expert research assistant in law. Use your knowledge base to answer questions about law.",
-            model="gpt-4o-mini",
+            model="gpt-4.1-2025-04-14",
             tools=[{"type": "file_search"}],
         )
         
