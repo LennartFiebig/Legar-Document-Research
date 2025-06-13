@@ -7,15 +7,46 @@ import glob
 st.set_page_config(page_title="Legal Research Assistant", layout="wide")
 st.title("Legal Research Assistant")
 
-# Initialize API key in session state if not present
+# Initialize API key and validation state in session state if not present
 if "openai_api_key" not in st.session_state:
     st.session_state.openai_api_key = ""
+if "api_key_valid" not in st.session_state:
+    st.session_state.api_key_valid = False
+if "success_message" not in st.session_state:
+    st.session_state.success_message = None
 
-# API Key input
-api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password", value=st.session_state.openai_api_key)
+# API Key input and validation
+with st.sidebar:
+    api_key = st.text_input("Enter your OpenAI API Key", type="password", value=st.session_state.openai_api_key)
+    
+    def validate_api_key():
+        try:
+            # Try to create a client with the provided key
+            test_client = OpenAI(api_key=api_key)
+            # Make a simple API call to validate the key
+            test_client.models.list()
+            st.session_state.openai_api_key = api_key
+            st.session_state.api_key_valid = True
+            st.session_state.error_message = None
+            st.session_state.success_message = "✅ API key validated successfully! You can now use the chat."
+        except Exception as e:
+            st.session_state.api_key_valid = False
+            st.session_state.error_message = "Invalid API key. Please check your key and try again."
+            st.session_state.success_message = None
 
-if api_key:
-    st.session_state.openai_api_key = api_key
+    # Add validate button
+    if st.button("Validate API Key"):
+        validate_api_key()
+
+    # Show error message if validation failed
+    if hasattr(st.session_state, 'error_message') and st.session_state.error_message:
+        st.error(st.session_state.error_message)
+    
+    # Show success message if validation was successful
+    if st.session_state.success_message:
+        st.success(st.session_state.success_message)
+
+if st.session_state.api_key_valid:
     # Initialize OpenAI client
     @st.cache_resource
     def get_client():
@@ -123,4 +154,4 @@ if api_key:
             # Add assistant response to chat history
             st.session_state.messages.append({"role": "assistant", "content": response_text})
 else:
-    st.warning("Please enter your OpenAI API key in the sidebar to begin.")
+    st.info("Please enter your OpenAI API key in the sidebar and click 'Validate API Key' to begin.")
