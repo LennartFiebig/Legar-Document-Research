@@ -147,7 +147,7 @@ if st.session_state.api_key_valid:
             # Display the response
             response_text = message_content.value
             if citations:
-                response_text += "\n\n" + "\n".join(citations)
+                response_text += "\n\n" + "\n\n".join(citations)
             
             message_placeholder.write(response_text)
             
