@@ -139,10 +139,10 @@ if st.session_state.api_key_valid:
             
             # Process citations if any
             for index, annotation in enumerate(annotations):
-                message_content.value = message_content.value.replace(annotation.text, f"[{index}]")
+                message_content.value = message_content.value.replace(annotation.text, f"[{index+1}]")
                 if file_citation := getattr(annotation, "file_citation", None):
                     cited_file = client.files.retrieve(file_citation.file_id)
-                    citations.append(f"[{index}] {cited_file.filename}")
+                    citations.append(f"[{index+1}] {cited_file.filename}")
             
             # Display the response
             response_text = message_content.value
